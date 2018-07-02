@@ -1,0 +1,5 @@
+---
+- name: Creando Grupos
+  script: create-groups.sh '{{ item }}' '{{ jboss_eap_home_path }}' '{{ hostvars[inventory_hostname]['ansible_'+jboss_binding_interface].ipv4.address }}'
+  with_flattened:
+     - "{{ new_groups }}"

@@ -1,0 +1,102 @@
+---
+ - name: Crear directorio de configuracion
+   file: path=/etc/jboss-as state=directory
+
+#############################
+# Instructiones para RHEL 6 #
+#############################
+ - name: Instalando jboss como servicio RHEL6 1/3
+   file: src={{jboss_eap_home_path}}/bin/init.d/jboss-as-domain.sh dest=/etc/init.d/{{jboss_service_name}} state=link
+   when: ansible_distribution_major_version == "6"
+
+ - name: Instalando jboss como servicio RHEL6 2/3
+   file: src={{jboss_eap_home_path}}/bin/init.d/jboss-as.conf dest=/etc/jboss-as/jboss-as.conf state=link
+   when: ansible_distribution_major_version == "6"
+
+ - name: Instalando jboss como servicio RHEL6 3/3
+   lineinfile: dest=/etc/jboss-as/jboss-as.conf line={{ item }}
+   with_items:
+    - JBOSS_USER={{ jboss_eap_user }}
+    - JBOSS_HOME={{jboss_eap_home_path}}
+    - JBOSS_HOST_CONFIG=host.xml
+    - JBOSS_PIDFILE={{jboss_eap_home_path}}/domain/jboss-as-domain.pid
+   when: ansible_distribution_major_version == "6"
+
+ - name: permisos de escritura sobre el directorio jboss
+   file: path={{jboss_eap_home_path}} owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
+   when: ansible_distribution_major_version == "6"
+
+ - name: add script to chkconfig
+   command: chdir=/sbin/ ./chkconfig  --add {{jboss_service_name}}
+   when: ansible_distribution_major_version == "6"
+
+ - name: Enable JBoss to be started at boot
+   service: name={{jboss_service_name}} enabled=yes state=started
+   when: ansible_distribution_major_version == "6"
+
+#############################
+# Instructiones para RHEL 7 #
+#############################
+ - name: Instalar jboss como servicio 1/3 - Crea link simbolico
+   file: src={{jboss_eap_home_path}}/bin/init.d/jboss-as.conf dest=/etc/jboss-as/jboss-as.conf state=link
+   when: ansible_distribution_major_version == "7"
+
+ - name: Instalar jboss como servicio
+   lineinfile: dest={{jboss_eap_home_path}}/bin/init.d/jboss-as.conf line={{ item }}
+   with_items:
+#      - STARTUP_WAIT=100
+#      - SHUTDOWN_WAIT=30
+      - JBOSS_USER={{ jboss_eap_user }}
+      - JBOSS_HOME={{jboss_eap_home_path}}
+      - JBOSS_CONFIG=domain.xml
+      - JBOSS_SCRIPT={{jboss_eap_home_path}}/bin/domain.sh
+      - JBOSS_PIDFILE={{jboss_eap_home_path}}/domain/jboss-as-domain.pid
+   when: ansible_distribution_major_version == "7"
+
+ - name: Crear directorio de configuracion /var/log
+   file: path=/var/log/jboss-as state=directory
+   when: ansible_distribution_major_version == "7"
+
+ - name: Crear directorio de configuracion /var/run
+   file: path=/var/run/jboss-as state=directory
+   when: ansible_distribution_major_version == "7"
+
+ - name: permisos de escritura sobre el directorio /var/log
+   file: path=/var/log/jboss-as owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
+   when: ansible_distribution_major_version == "7"
+
+ - name: permisos de escritura sobre el directorio /var/run
+   file: path=/var/run/jboss-as owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
+   when: ansible_distribution_major_version == "7"
+
+ - name: Crear archivo de configuracion para Jboss EAP como servicio
+   copy: content="" dest=/etc/systemd/system/{{jboss_service_name}}.service force=no owner={{ jboss_eap_user }} group={{ jboss_eap_user }}
+   when: ansible_distribution_major_version == "7"
+
+ - name: Instalar jboss como servicio 3/3
+   lineinfile: dest=/etc/systemd/system/{{jboss_service_name}}.service line={{ item }}
+   with_items:
+      - "[Unit]"
+      - Description=Jboss Application Server - DER
+      - After=syslog.target network.target
+      - ""
+      - "[Service]"
+      - Type=forking
+      - ExecStart={{jboss_eap_home_path}}/bin/init.d/jboss-as-domain.sh start
+      - ExecStop={{jboss_eap_home_path}}/bin/init.d/jboss-as-domain.sh stop
+      - ""
+      - "[Install]"
+      - WantedBy=multi-user.target
+   when: ansible_distribution_major_version == "7"
+
+ - name: permisos de escritura sobre el directorio jboss
+   file: path={{jboss_eap_home_path}} owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
+   when: ansible_distribution_major_version == "7"
+
+ - name: Restart Daemon
+   shell: systemctl daemon-reload
+   when: ansible_distribution_major_version == "7"
+
+ - name: Enable JBoss to be started at boot
+   service: name={{jboss_service_name}}.service enabled=yes state=started
+   when: ansible_distribution_major_version == "7"
