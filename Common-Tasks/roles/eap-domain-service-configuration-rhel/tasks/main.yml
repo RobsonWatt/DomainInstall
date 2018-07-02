@@ -38,11 +38,11 @@
 # Instructiones para RHEL 7 #
 #############################
  - name: Instalar jboss como servicio 1/3 - Crea link simbolico
-   file: src={{jboss_eap_home_path}}/bin/init.d/jboss-as.conf dest=/etc/jboss-as/jboss-as.conf state=link
+   file: src={{jboss_eap_home_path}}/bin/init.d/jboss-eap.conf dest=/etc/jboss-eap/jboss-eap.conf state=link
    when: ansible_distribution_major_version == "7"
 
  - name: Instalar jboss como servicio
-   lineinfile: dest={{jboss_eap_home_path}}/bin/init.d/jboss-as.conf line={{ item }}
+   lineinfile: dest={{jboss_eap_home_path}}/bin/init.d/jboss-eap.conf line={{ item }}
    with_items:
 #      - STARTUP_WAIT=100
 #      - SHUTDOWN_WAIT=30
@@ -50,23 +50,23 @@
       - JBOSS_HOME={{jboss_eap_home_path}}
       - JBOSS_CONFIG=domain.xml
       - JBOSS_SCRIPT={{jboss_eap_home_path}}/bin/domain.sh
-      - JBOSS_PIDFILE={{jboss_eap_home_path}}/domain/jboss-as-domain.pid
+      - JBOSS_PIDFILE={{jboss_eap_home_path}}/domain/jboss-eap-domain.pid
    when: ansible_distribution_major_version == "7"
 
  - name: Crear directorio de configuracion /var/log
-   file: path=/var/log/jboss-as state=directory
+   file: path=/var/log/jboss-eap state=directory
    when: ansible_distribution_major_version == "7"
 
  - name: Crear directorio de configuracion /var/run
-   file: path=/var/run/jboss-as state=directory
+   file: path=/var/run/jboss-eap state=directory
    when: ansible_distribution_major_version == "7"
 
  - name: permisos de escritura sobre el directorio /var/log
-   file: path=/var/log/jboss-as owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
+   file: path=/var/log/jboss-eap owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
    when: ansible_distribution_major_version == "7"
 
  - name: permisos de escritura sobre el directorio /var/run
-   file: path=/var/run/jboss-as owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
+   file: path=/var/run/jboss-eap owner={{ jboss_eap_user }} group={{ jboss_eap_user }} recurse=yes state=directory
    when: ansible_distribution_major_version == "7"
 
  - name: Crear archivo de configuracion para Jboss EAP como servicio
@@ -82,8 +82,8 @@
       - ""
       - "[Service]"
       - Type=forking
-      - ExecStart={{jboss_eap_home_path}}/bin/init.d/jboss-as-domain.sh start
-      - ExecStop={{jboss_eap_home_path}}/bin/init.d/jboss-as-domain.sh stop
+      - ExecStart={{jboss_eap_home_path}}/bin/init.d/jboss-eap-rhel.sh start
+      - ExecStop={{jboss_eap_home_path}}/bin/init.d/jboss-eap-rhel.sh stop
       - ""
       - "[Install]"
       - WantedBy=multi-user.target
