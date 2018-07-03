@@ -4,4 +4,4 @@
 #10.65.176.71 ansible_connection=ssh ansible_ssh_user=root ansible_ssh_pass=QwAo2U6GRxyNPKiZaOCx
 
 # RHEL7
-10.10.180.140 ansible_connection=ssh ansible_ssh_user=root ansible_ssh_pass=QwAo2U6GRxyNPKiZaOCx
+nodo131 ansible_connection=ssh ansible_ssh_user=root

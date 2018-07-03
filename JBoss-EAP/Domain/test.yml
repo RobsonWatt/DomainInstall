@@ -1,0 +1,14 @@
+---
+# This playbook
+
+- hosts: domaincontroller
+  remote_user: root
+  vars:
+    jboss_service_name: jboss-eap
+    jboss_eap_version: 7.1.0
+
+  vars_files:
+    - variables/jboss-eap-variables.yml
+
+  roles:
+    - eap-domain-firewalld

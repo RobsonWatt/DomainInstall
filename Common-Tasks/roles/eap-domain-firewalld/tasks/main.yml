@@ -1,0 +1,18 @@
+---
+- name: Firewall settings
+  firewalld: zone=public port=9999/tcp permanent=true state=enabled
+  firewalld: zone=public port=9990/tcp permanent=true state=enabled
+
+- name: Reload Firewall
+  shell: firewall-cmd --reload
+
+
+#- name: Abriendo puertos firewall
+#  firewalld: 
+#   port: "{{item.port}}"
+#   permanent: true
+#   state: enabled
+#   immediate: true
+#   with_items:
+#    - {port: '9999/tcp'}
+#    - {port: '9990/tcp'}

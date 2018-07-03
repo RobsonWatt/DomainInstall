@@ -12,3 +12,9 @@
 
  - name: Copiando host-master.xml
    copy: remote_src=True src={{jboss_eap_home_path}}/domain/configuration/host-master.xml dest={{jboss_eap_home_path}}/domain/configuration/host.xml
+
+ - name: Agregando binding
+   replace:
+     path: /opt/jboss-eap/domain/configuration/host.xml
+     regexp: "127.0.0.1"
+     replace: "{{ hostvars[inventory_hostname]['ansible_'+jboss_binding_interface].ipv4.address }}"
